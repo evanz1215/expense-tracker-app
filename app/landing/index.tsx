@@ -1,10 +1,11 @@
 import CustomButton from "@/components/custom-button";
+import CustomText from "@/components/custom-text";
 import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
 import { Link, RelativePathString, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Icon, Text } from "react-native-paper";
+import { Icon } from "react-native-paper";
 
 const LandingScreen = () => {
   const router = useRouter();
@@ -24,22 +25,22 @@ const LandingScreen = () => {
             <Icon source="finance" size={60} color={primaryColor} />
           </View>
 
-          <Text style={{ color: "white", fontSize: 40, fontWeight: "700" }}>
-            FinTrack
-          </Text>
+          <CustomText
+            value="FinTrack"
+            color="white"
+            fontSize={40}
+            fontWeight="700"
+          />
 
-          <Text
-            style={{
-              color: "#e4e4e4aa",
-              fontSize: 15,
-              marginTop: 10,
-              textAlign: "center",
-              paddingHorizontal: 20,
-              fontWeight: "600",
-            }}
-          >
-            Take control of your finances with FinTrack - Your ultimate expense
-          </Text>
+          <CustomText
+            value="Take control of your finances with FinTrack - Your personal finance companion."
+            color="#e4e4e4aa"
+            fontSize={15}
+            textAlign="center"
+            marginTop={10}
+            fontWeight="600"
+            marginHorizontal={40}
+          />
         </View>
         <View style={styles.navigations}>
           <CustomButton
@@ -55,13 +56,17 @@ const LandingScreen = () => {
               marginTop: 10,
             }}
           >
-            <Text style={{ color: "white", fontSize: 16 }}>
+            {/* <Text style={{ color: "white", fontSize: 16 }}>
               Already have an account?{" "}
-            </Text>
+            </Text> */}
+
+            <CustomText
+              value="Already have an account?"
+              color="white"
+              fontSize={16}
+            />
             <Link href={"/login"} style={{ textDecorationLine: "underline" }}>
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>
-                Login
-              </Text>
+              <CustomText value="Login" color="white" fontSize={16} />
             </Link>
           </View>
         </View>
