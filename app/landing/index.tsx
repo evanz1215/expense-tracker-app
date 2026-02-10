@@ -56,17 +56,19 @@ const LandingScreen = () => {
               marginTop: 10,
             }}
           >
-            {/* <Text style={{ color: "white", fontSize: 16 }}>
-              Already have an account?{" "}
-            </Text> */}
-
             <CustomText
               value="Already have an account?"
               color="white"
               fontSize={16}
+              fontWeight="600"
             />
             <Link href={"/login"} style={{ textDecorationLine: "underline" }}>
-              <CustomText value="Login" color="white" fontSize={16} />
+              <CustomText
+                value="Login"
+                color="white"
+                fontSize={16}
+                fontWeight="600"
+              />
             </Link>
           </View>
         </View>
