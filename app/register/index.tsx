@@ -35,7 +35,7 @@ const RegisterScreen = () => {
           backgroundColor: "#fff",
         }}
       >
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.push("/landing")}>
           <Icon source="arrow-left" size={30} />
         </TouchableOpacity>
 
