@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Icon, TextInput } from "react-native-paper";
+import Toast from "react-native-toast-message";
 
 const RegisterScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -31,9 +32,19 @@ const RegisterScreen = () => {
 
     setLoading(false);
     if (response.success) {
+      Toast.show({
+        type: "success",
+        text1: "Registration Successful",
+        text2: "You can now login with your credentials.",
+      });
       router.push("/login");
     } else {
-      alert("Registration failed. Please try again.");
+      // alert("Registration failed. Please try again.");
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: response.message,
+      });
     }
   };
 
