@@ -2,13 +2,16 @@ import CustomButton from "@/components/custom-button";
 import CustomText from "@/components/custom-text";
 import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
-import { Link, useRouter } from "expo-router";
-import React from "react";
+import { loginUser } from "@/services/user";
+import { Link, RelativePathString, useRouter } from "expo-router";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Icon, TextInput } from "react-native-paper";
+import Toast from "react-native-toast-message";
 
 const LoginScreen = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -22,7 +25,38 @@ const LoginScreen = () => {
       password: "",
     },
   });
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async (data: any) => {
+    try {
+      setLoading(true);
+      const response = await loginUser(data);
+      console.log("🚀 ~ onSubmit ~ response:", response);
+
+      if (response.success) {
+        Toast.show({
+          type: "success",
+          text1: "Login Successful",
+          text2: "Welcome back! You have logged in successfully.",
+        });
+
+        setTimeout(() => {
+          router.push("/user/home" as RelativePathString);
+        }, 1000);
+      } else {
+        throw new Error(response.message || "Login failed.");
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2:
+          error instanceof Error
+            ? error.message
+            : "An error occurred during login.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaLayoutWrapper>
@@ -111,7 +145,13 @@ const LoginScreen = () => {
             {errors.password && <Text>{errors.password.message}</Text>}
           </View>
 
-          <CustomButton onPress={handleSubmit(onSubmit)}>Login</CustomButton>
+          <CustomButton
+            loading={loading}
+            disabled={loading}
+            onPress={handleSubmit(onSubmit)}
+          >
+            Login
+          </CustomButton>
 
           <View
             style={{

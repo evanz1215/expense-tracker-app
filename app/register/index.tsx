@@ -37,7 +37,10 @@ const RegisterScreen = () => {
         text1: "Registration Successful",
         text2: "You can now login with your credentials.",
       });
-      router.push("/login");
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
     } else {
       // alert("Registration failed. Please try again.");
       Toast.show({
@@ -157,7 +160,11 @@ const RegisterScreen = () => {
             {errors.password && <Text>{errors.password.message}</Text>}
           </View>
 
-          <CustomButton loading={loading} onPress={handleSubmit(onSubmit)}>
+          <CustomButton
+            loading={loading}
+            disabled={loading}
+            onPress={handleSubmit(onSubmit)}
+          >
             Register
           </CustomButton>
 
