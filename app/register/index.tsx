@@ -2,13 +2,15 @@ import CustomButton from "@/components/custom-button";
 import CustomText from "@/components/custom-text";
 import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
+import { registerNewUser } from "@/services/user";
 import { Link, useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Icon, TextInput } from "react-native-paper";
 
 const RegisterScreen = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -22,7 +24,18 @@ const RegisterScreen = () => {
       password: "",
     },
   });
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async (data: any) => {
+    setLoading(true);
+    const response = await registerNewUser(data);
+    console.log("🚀 ~ onSubmit ~ response:", response);
+
+    setLoading(false);
+    if (response.success) {
+      router.push("/login");
+    } else {
+      alert("Registration failed. Please try again.");
+    }
+  };
 
   return (
     <SafeAreaLayoutWrapper>
@@ -133,7 +146,9 @@ const RegisterScreen = () => {
             {errors.password && <Text>{errors.password.message}</Text>}
           </View>
 
-          <CustomButton onPress={handleSubmit(onSubmit)}>Register</CustomButton>
+          <CustomButton loading={loading} onPress={handleSubmit(onSubmit)}>
+            Register
+          </CustomButton>
 
           <View
             style={{
