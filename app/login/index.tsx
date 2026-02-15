@@ -2,7 +2,8 @@ import CustomButton from "@/components/custom-button";
 import CustomText from "@/components/custom-text";
 import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
-import { loginUser } from "@/services/user";
+import { loginUser } from "@/services/users";
+import { useAuthStore } from "@/store/auth-store";
 import { Link, RelativePathString, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -13,6 +14,7 @@ import Toast from "react-native-toast-message";
 const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setUser } = useAuthStore();
 
   const {
     control,
@@ -37,10 +39,10 @@ const LoginScreen = () => {
           text1: "Login Successful",
           text2: "Welcome back! You have logged in successfully.",
         });
-
+        setUser(response.data);
         setTimeout(() => {
           router.push("/user/home" as RelativePathString);
-        }, 1000);
+        }, 500);
       } else {
         throw new Error(response.message || "Login failed.");
       }

@@ -2,7 +2,7 @@ import CustomButton from "@/components/custom-button";
 import CustomText from "@/components/custom-text";
 import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
-import { registerNewUser } from "@/services/user";
+import { registerNewUser } from "@/services/users";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -40,7 +40,7 @@ const RegisterScreen = () => {
 
       setTimeout(() => {
         router.push("/login");
-      }, 1000);
+      }, 500);
     } else {
       // alert("Registration failed. Please try again.");
       Toast.show({

@@ -1,10 +1,21 @@
+import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
-import { Redirect, useRootNavigationState } from "expo-router";
-import React from "react";
-import { Text, View } from "react-native";
+import { useAuthStore } from "@/store/auth-store";
+import { Redirect, useRootNavigationState, useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 
 const IndexScreen = () => {
   const rootNavigationState = useRootNavigationState();
+  const { user, checkingUserSession } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!checkingUserSession && !user) {
+      router.push("/landing");
+    }
+  }, [user, checkingUserSession]);
 
   if (rootNavigationState?.key) {
     return <Redirect href="/landing" />;
@@ -13,7 +24,7 @@ const IndexScreen = () => {
   return (
     <SafeAreaLayoutWrapper>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Checking auth status ...</Text>
+        <ActivityIndicator size="large" color={primaryColor} />
       </View>
     </SafeAreaLayoutWrapper>
   );

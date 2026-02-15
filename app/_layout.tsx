@@ -1,7 +1,9 @@
 import { primaryColor } from "@/constants";
+import { AuthState, useAuthStore } from "@/store/auth-store";
 import * as NavigationBar from "expo-navigation-bar";
-import { Stack } from "expo-router";
+import { RelativePathString, Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { Platform } from "react-native";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
@@ -15,6 +17,8 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const router = useRouter();
+
   const theme = {
     ...DefaultTheme,
     colors: {
@@ -22,6 +26,20 @@ export default function RootLayout() {
       primary: primaryColor,
     },
   };
+
+  const { checkUserSession, user }: AuthState = useAuthStore();
+
+  useEffect(() => {
+    if (!user) {
+      checkUserSession();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      router.push("/user/home" as RelativePathString);
+    }
+  }, [user]);
 
   return (
     <PaperProvider theme={theme}>
