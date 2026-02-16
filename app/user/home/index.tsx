@@ -6,6 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 import { BottomNavigation, Icon } from "react-native-paper";
 import HomeTab from "./_components/home-tab-";
 import ProfileTab from "./_components/profile-tab";
+import CustomText from "@/components/custom-text";
 
 const UserHomePage = () => {
   const [index, setIndex] = useState(0);
@@ -63,9 +64,23 @@ const UserHomePage = () => {
         navigationState={{ index, routes: tabs }}
         onIndexChange={setIndex}
         renderScene={renderScene}
-        barStyle={{ backgroundColor: "#e8e8e8ff", height: 80 }}
+        barStyle={{
+          backgroundColor: "#e8e8e8ff",
+          height: 80,
+          paddingBottom: 25,
+        }}
         // add animation to tab transition
         shifting={true}
+        renderLabel={({ route }) => (
+          <CustomText
+            value={route.title}
+            fontWeight="700"
+            fontSize={12}
+            textAlign="center"
+          />
+        )}
+        activeColor={primaryColor}
+        inactiveColor="gray"
       />
     </SafeAreaLayoutWrapper>
   );
