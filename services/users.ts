@@ -139,3 +139,35 @@ export const logoutUser = async () => {
     };
   }
 };
+
+export const updateUserProfile = async (payload: Partial<IUser>) => {
+  try {
+    const { data, error } = await supabaseConfig
+      .from("user_profiles")
+      .update({
+        name: payload.name,
+        // profile_picture: payload.profile_picture,
+      })
+      .eq("email", payload.email)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return {
+      success: true,
+      message: "Profile updated successfully.",
+      data: data as IUser,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "An error occurred while updating the profile.",
+    };
+  }
+};

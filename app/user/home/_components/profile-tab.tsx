@@ -50,6 +50,9 @@ const ProfileTab = () => {
             height: 150,
             borderRadius: 75,
             alignSelf: "center",
+            borderColor: "#ccc",
+            borderWidth: 2,
+            padding: 5,
           }}
         />
       </View>
