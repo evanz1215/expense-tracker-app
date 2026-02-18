@@ -146,7 +146,7 @@ export const updateUserProfile = async (payload: Partial<IUser>) => {
       .from("user_profiles")
       .update({
         name: payload.name,
-        // profile_picture: payload.profile_picture,
+        profile_picture: payload.profile_picture,
       })
       .eq("email", payload.email)
       .select()
@@ -169,5 +169,40 @@ export const updateUserProfile = async (payload: Partial<IUser>) => {
           ? error.message
           : "An error occurred while updating the profile.",
     };
+  }
+};
+
+export const uploadImageToSupabaseStorage = async (
+  fileUri: string,
+  fileName: string,
+) => {
+  try {
+    // convert file uri to blob
+    const response = await fetch(fileUri);
+    const blob = await response.blob();
+
+    const arrayBuffer = await new Response(blob).arrayBuffer();
+
+    const { data, error } = await supabaseConfig.storage
+      .from("main") // your bucket name
+      .upload(fileName, arrayBuffer, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const { data: publicUrlData } = supabaseConfig.storage
+      .from("main")
+      .getPublicUrl(fileName);
+
+    return publicUrlData.publicUrl;
+
+    // upload to supabase storage
+  } catch (error) {
+    console.error("Image upload error:", error);
+    throw error;
   }
 };

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
 import React, { useState } from "react";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
 import Flexbox from "@/components/flexbox";
@@ -9,13 +9,18 @@ import { Controller, useForm } from "react-hook-form";
 import { useAuthStore } from "@/store/auth-store";
 import CustomButton from "@/components/custom-button";
 import Toast from "react-native-toast-message";
-import { updateUserProfile } from "@/services/users";
+import {
+  updateUserProfile,
+  uploadImageToSupabaseStorage,
+} from "@/services/users";
 import { IUser } from "@/interfaces";
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfilePage = () => {
   const { user, setUser } = useAuthStore();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
     control,
@@ -31,10 +36,19 @@ const EditProfilePage = () => {
   const onSubmit = async (data: { name: string; email: string }) => {
     try {
       setLoading(true);
+      let imageUrl = user?.profile_picture || null;
+      if (selectedImage) {
+        // Upload the selected image to supabase Storage
+        imageUrl = await uploadImageToSupabaseStorage(
+          selectedImage,
+          `${new Date().toISOString()}.jpg`,
+        );
+      }
 
       const response = await updateUserProfile({
         name: data.name,
         email: data.email,
+        profile_picture: imageUrl!,
       });
 
       if (response.success) {
@@ -61,6 +75,40 @@ const EditProfilePage = () => {
     }
   };
 
+  const handleFileSelect = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission required",
+          "Permission to access the media library is required.",
+        );
+        return;
+      }
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        setSelectedImage(uri);
+        // Here you can also upload the selected image to your server if needed
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred while selecting the image.",
+      });
+    }
+  };
+
   return (
     <SafeAreaLayoutWrapper>
       <Flexbox padding={20} gap={20}>
@@ -80,7 +128,10 @@ const EditProfilePage = () => {
         <Flexbox gap={10}>
           <Image
             source={{
-              uri: user?.profile_picture || "http://via.placeholder.com/150",
+              uri:
+                selectedImage ||
+                user?.profile_picture ||
+                "http://via.placeholder.com/150",
             }}
             style={{
               width: 150,
@@ -95,6 +146,7 @@ const EditProfilePage = () => {
           <Button
             style={{ alignSelf: "center", marginTop: 10 }}
             mode="outlined"
+            onPress={handleFileSelect}
           >
             <CustomText value="Change" />
           </Button>
