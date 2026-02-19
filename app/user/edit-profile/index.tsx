@@ -45,7 +45,7 @@ const EditProfilePage = () => {
         );
       }
 
-      const response = await updateUserProfile({
+      const response: any = await updateUserProfile({
         name: data.name,
         email: data.email,
         profile_picture: imageUrl!,

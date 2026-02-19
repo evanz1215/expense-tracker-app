@@ -1,11 +1,11 @@
+import TransactionForm from "@/components/transaction-form";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
 import React from "react";
-import { Text } from "react-native";
 
 const AddTransaction = () => {
   return (
     <SafeAreaLayoutWrapper>
-      <Text>AddTransaction</Text>
+      <TransactionForm formType="add" />
     </SafeAreaLayoutWrapper>
   );
 };
