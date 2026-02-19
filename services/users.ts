@@ -1,4 +1,5 @@
 import { supabaseConfig } from "@/config/supabase-config";
+import { handleCatchBlockReturn } from "@/helpers";
 import { IUser } from "@/interfaces";
 
 export const registerNewUser = async (payload: Partial<IUser>) => {
@@ -35,14 +36,10 @@ export const registerNewUser = async (payload: Partial<IUser>) => {
       message: "User registered successfully.",
     };
   } catch (error) {
-    console.error("Register error:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "An error occurred while registering the user.",
-    };
+    return handleCatchBlockReturn(
+      error,
+      "An error occurred while registering the user.",
+    );
   }
 };
 
@@ -78,16 +75,10 @@ export const loginUser = async (payload: {
       data: userData as IUser,
     };
   } catch (error) {
-    console.error("Login error:", error);
-    throw error;
-
-    // return {
-    //   success: false,
-    //   message:
-    //     error instanceof Error
-    //       ? error.message
-    //       : "An error occurred while logging in the user.",
-    // };
+    return handleCatchBlockReturn(
+      error,
+      "An error occurred while logging in the user.",
+    );
   }
 };
 
@@ -113,6 +104,7 @@ export const getCurrentUserSession = async () => {
 
     return data as IUser;
   } catch (error) {
+    console.error("getCurrentUserSession error:", error);
     return null;
   }
 };
@@ -130,13 +122,10 @@ export const logoutUser = async () => {
       message: "User logged out successfully.",
     };
   } catch (error) {
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "An error occurred while logging out.",
-    };
+    return handleCatchBlockReturn(
+      error,
+      "An error occurred while logging out.",
+    );
   }
 };
 
@@ -162,13 +151,10 @@ export const updateUserProfile = async (payload: Partial<IUser>) => {
       data: data as IUser,
     };
   } catch (error) {
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "An error occurred while updating the profile.",
-    };
+    return handleCatchBlockReturn(
+      error,
+      "An error occurred while updating the profile.",
+    );
   }
 };
 
@@ -183,7 +169,7 @@ export const uploadImageToSupabaseStorage = async (
 
     const arrayBuffer = await new Response(blob).arrayBuffer();
 
-    const { data, error } = await supabaseConfig.storage
+    const { error } = await supabaseConfig.storage
       .from("main") // your bucket name
       .upload(fileName, arrayBuffer, {
         cacheControl: "3600",
