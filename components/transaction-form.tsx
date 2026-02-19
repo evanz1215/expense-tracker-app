@@ -211,7 +211,7 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
                   onDismiss={onDismissSingle}
                   date={value ? dayjs(value).toDate() : dayjs().toDate()}
                   onConfirm={(params) => {
-                    onChange(params.date);
+                    onChange(dayjs(params.date).format("YYYY-MM-DD"));
                     setOpen(false);
                   }}
                 />
