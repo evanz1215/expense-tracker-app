@@ -1,4 +1,4 @@
-import { primaryColor } from "@/constants";
+import { categories, primaryColor, transactionTypes } from "@/constants";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -9,11 +9,16 @@ import CustomText from "./custom-text";
 import Flexbox from "./flexbox";
 import { DatePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
+import { Dropdown } from "react-native-paper-dropdown";
+import { useAuthStore } from "@/store/auth-store";
+import { addTransaction } from "@/services/transactions";
+import Toast from "react-native-toast-message";
 
 const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user } = useAuthStore();
 
   const onDismissSingle = useCallback(() => {
     setOpen(false);
@@ -29,6 +34,8 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
       amount: "",
       description: "",
       date: null,
+      type: "",
+      category: "",
     },
   });
 
@@ -36,9 +43,39 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
     try {
       setLoading(true);
       console.log("🚀 ~ onSubmit ~ data:", data);
-      // TODO: implement submit logic
+      let response = null;
+
+      if (formType === "add") {
+        response = await addTransaction({
+          user_id: user?.id,
+          name: data.name,
+          amount: parseFloat(data.amount),
+          description: data.description,
+          date: data.date,
+          type: data.type,
+          category: data.category,
+          receipts: [],
+        });
+      }
+
+      if (response && response?.success) {
+        Toast.show({
+          type: "success",
+          text1:
+            formType === "add"
+              ? "Transaction added successfully!"
+              : "Transaction updated successfully!",
+        });
+        setTimeout(() => {
+          router.back();
+        }, 500);
+      }
     } catch (error) {
       console.error("Error submitting transaction form:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error submitting transaction form",
+      });
     } finally {
       setLoading(false);
     }
@@ -147,14 +184,25 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
                   justifyContent: "center",
                   flex: 1,
                   alignItems: "center",
+                  marginVertical: 25,
                 }}
               >
                 <Button
                   onPress={() => setOpen(true)}
                   uppercase={false}
                   mode="outlined"
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderRadius: 4,
+                    borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "flex-start",
+                    borderColor: "#5b5b5bff",
+                  }}
+                  icon="calendar"
                 >
-                  Pick single date
+                  {value ? dayjs(value).format("DD MMMM YYYY") : "Select Date"}
                 </Button>
                 <DatePickerModal
                   locale="en"
@@ -170,6 +218,46 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
               </View>
             )}
             name="date"
+          />
+        </Flexbox>
+
+        {/* Transaction Type */}
+        <Flexbox>
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View>
+                <Dropdown
+                  label="Transaction Type"
+                  placeholder="Select Type"
+                  options={transactionTypes}
+                  value={value}
+                  onSelect={onChange}
+                  mode="outlined"
+                />
+              </View>
+            )}
+            name="type"
+          />
+        </Flexbox>
+
+        {/* Category */}
+        <Flexbox>
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View>
+                <Dropdown
+                  label="Category"
+                  placeholder="Select Category"
+                  options={categories}
+                  value={value}
+                  onSelect={onChange}
+                  mode="outlined"
+                />
+              </View>
+            )}
+            name="category"
           />
         </Flexbox>
 

@@ -17,4 +17,5 @@ export interface ITransaction {
   date: string;
   description?: string;
   create_at: string;
+  receipts: string[];
 }
