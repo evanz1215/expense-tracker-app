@@ -7,6 +7,7 @@ export const addTransaction = async (payload: Partial<ITransaction>) => {
     const { data, error } = await supabaseConfig.from("transactions").insert([
       {
         user_id: payload.user_id,
+        name: payload.name,
         amount: payload.amount,
         type: payload.type,
         category: payload.category,
@@ -42,6 +43,7 @@ export const editTransactionById = async ({
     const { data, error } = await supabaseConfig
       .from("transactions")
       .update({
+        name: payload.name,
         amount: payload.amount,
         type: payload.type,
         category: payload.category,
@@ -89,7 +91,7 @@ export const deleteTransactionById = async (transactionId: number) => {
   }
 };
 
-export const getTransactionsByUserId = async (userId: string) => {
+export const getTransactionsByUserId = async (userId: number) => {
   try {
     const { data, error } = await supabaseConfig
       .from("transactions")
