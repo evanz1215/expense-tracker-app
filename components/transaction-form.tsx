@@ -1,5 +1,5 @@
 import { categories, primaryColor, transactionTypes } from "@/constants";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -11,14 +11,20 @@ import { DatePickerModal } from "react-native-paper-dates";
 import dayjs from "dayjs";
 import { Dropdown } from "react-native-paper-dropdown";
 import { useAuthStore } from "@/store/auth-store";
-import { addTransaction } from "@/services/transactions";
+import { addTransaction, editTransactionById } from "@/services/transactions";
 import Toast from "react-native-toast-message";
+import {
+  TransactionsState,
+  useTransactionsStore,
+} from "@/store/transactions-store";
 
 const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { user } = useAuthStore();
+  const { selectedTransactionForEdit }: TransactionsState =
+    useTransactionsStore();
 
   const onDismissSingle = useCallback(() => {
     setOpen(false);
@@ -30,12 +36,12 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      name: "",
-      amount: "",
-      description: "",
-      date: null,
-      type: "",
-      category: "",
+      name: selectedTransactionForEdit?.name || "",
+      amount: selectedTransactionForEdit?.amount.toString() || "",
+      description: selectedTransactionForEdit?.description || "",
+      date: selectedTransactionForEdit?.date || null,
+      type: selectedTransactionForEdit?.type || "",
+      category: selectedTransactionForEdit?.category || "",
     },
   });
 
@@ -45,16 +51,25 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
       console.log("🚀 ~ onSubmit ~ data:", data);
       let response = null;
 
+      const payload = {
+        name: data.name,
+        amount: parseFloat(data.amount),
+        description: data.description,
+        date: data.date,
+        type: data.type,
+        category: data.category,
+        receipts: [],
+      };
+
       if (formType === "add") {
         response = await addTransaction({
           user_id: user?.id,
-          name: data.name,
-          amount: parseFloat(data.amount),
-          description: data.description,
-          date: data.date,
-          type: data.type,
-          category: data.category,
-          receipts: [],
+          ...payload,
+        });
+      } else {
+        response = await editTransactionById({
+          transactionId: selectedTransactionForEdit!.id,
+          payload,
         });
       }
 
@@ -67,7 +82,7 @@ const TransactionForm = ({ formType }: { formType: "add" | "edit" }) => {
               : "Transaction updated successfully!",
         });
         setTimeout(() => {
-          router.back();
+          router.push("/user/transactions" as RelativePathString);
         }, 500);
       }
     } catch (error) {

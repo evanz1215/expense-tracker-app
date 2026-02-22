@@ -6,14 +6,24 @@ import CustomText from "@/components/custom-text";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
-const TransactionItem = ({ transaction }: { transaction: ITransaction }) => {
+interface TransactionItemProps {
+  transaction: ITransaction;
+  onPress?: () => void;
+}
+
+const TransactionItem = ({ transaction, onPress }: TransactionItemProps) => {
   const router = useRouter();
 
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/user/transactions/${transaction.id}` as any);
+    }
+  };
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
-      onPress={() => router.push(`/user/transactions/${transaction.id}` as any)}
-    >
+    <TouchableOpacity activeOpacity={0.75} onPress={handlePress}>
       <Flexbox
         padding={10}
         style={{

@@ -4,19 +4,21 @@ import { primaryColor } from "@/constants";
 import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
 import { getTransactionsByUserId } from "@/services/transactions";
 import { useAuthStore } from "@/store/auth-store";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import TransactionItem from "./_components/transaction-item";
 import { ITransaction } from "@/interfaces";
+import { useTransactionsStore } from "@/store/transactions-store";
 
 const TransactionScreen = () => {
   const router = useRouter();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
+  const { setSelectedTransactionForEdit } = useTransactionsStore();
 
   const fetchTransactions = async () => {
     try {
@@ -69,7 +71,17 @@ const TransactionScreen = () => {
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <TransactionItem transaction={item} />}
+        renderItem={({ item }) => (
+          <TransactionItem
+            transaction={item}
+            onPress={() => {
+              setSelectedTransactionForEdit(item);
+              router.push(
+                `/user/transactions/${item.id}` as RelativePathString,
+              );
+            }}
+          />
+        )}
         contentContainerStyle={{ padding: 20 }}
         ListEmptyComponent={() => (
           <Flexbox justifyContent="center" alignItems="center">

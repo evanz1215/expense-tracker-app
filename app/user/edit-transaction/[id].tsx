@@ -1,7 +1,6 @@
-import { View, Text } from "react-native";
-import React from "react";
-import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
 import TransactionForm from "@/components/transaction-form";
+import SafeAreaLayoutWrapper from "@/safe-area-layout-wrapper";
+import React from "react";
 
 const EditTransaction = () => {
   return (
